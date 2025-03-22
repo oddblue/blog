@@ -1,7 +1,3 @@
-<script setup>
-import Home from './views/Home.vue';
-</script>
-
 <template>
   <div id="app">
     <!-- 路由导航 -->
@@ -9,3 +5,11 @@ import Home from './views/Home.vue';
     <router-view></router-view>
   </div>
 </template>
+
+<style>
+body {
+  margin: 0;
+  padding: 0;
+}
+
+</style>

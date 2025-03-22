@@ -1,26 +1,16 @@
-<template lang="">
-    <div class='container'>
-        <div>首页</div>
-        <div>
-            <div>
-                <div>笔记</div>
-                <div>八股文</div>
-                <div>封装函数</div>
-                <div>网址导航</div>
-            </div>
-            <div>深色模式</div>
-            <div>git</div>
-        </div>
+<template>
+    <div class='home-container'>
+        <Nabar />
     </div>
 </template>
-<script>
-export default {
-    
-}
+<script setup>
+import Nabar from '../components/Nabar.vue';
 </script>
-<style scoped lang="">
-.container{
-    display:fixed
-    
+<style scoped>
+.home-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
 }
 </style>
