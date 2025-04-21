@@ -1,23 +1,23 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
-import { plugin as markdown } from 'vite-plugin-markdown'; // 使用命名导入
+import { plugin as markdown } from 'vite-plugin-markdown';
+import MarkdownIt from 'markdown-it';
+
+import svgLoader from 'vite-svg-loader'; // 导入 vite-svg-loader
+
+
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+});
 
 export default defineConfig({
   plugins: [
     vue(),
     markdown({
-      mode: ['html', 'toc'],
-      markdownIt: {
-        html: true,
-      },
-      markdownItSetup(md) {
-        md.use(require('markdown-it-anchor'));
-      },
-      // 更新 glob 选项
-      glob: {
-        query: '?raw',
-        import: 'default'
-      }
-    })
-  ]
+      markdownIt: md,
+    }),
+    svgLoader() // 添加 vite-svg-loader
+  ],
 });

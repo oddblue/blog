@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Post from '../views/Post.vue'
-
+import SiteNavigation from '../views/SiteNavigation.vue';
 // 预加载所有 .md 文件
 const modules = import.meta.glob('../posts/**/*.md', { query: '?raw', import: 'default', eager: true });
 
@@ -19,41 +19,33 @@ const routes = [
     },
     {
         path: '/posts/:pathMatch(.*)*',
+        //:pathMatch 是一个命名参数，表示匹配 /posts/ 后的路径段。pathMatch = ['笔记', 'CSS', 'css-animation.md']
+        //(.*)* 是一个通配符模式，允许匹配任意数量的路径段（包括零个）。
         name: 'Post',
         component: Post,
         props: (route) => ({
             path: `/posts/${route.params.pathMatch.join('/')}`,
-        }),
-        beforeEnter: (to, from, next) => {
-            //检查请求的路径是否直接对应一个 Markdown 文件（通过 mdPaths 数组判断）。
-            //如果不是 .md 文件，而是文件夹路径，则查找该文件夹下的第一个 .md 文件并重定向。
-            //例如，访问 /posts/blog 时，如果 /posts/blog/post1.md 存在，则重定向到 /posts/blog/post1.md。
-            const fullPath = `/posts/${to.params.pathMatch.join('/')}`;
-            const isMdFile = mdPaths.some((mdPath) => mdPath === fullPath);
-
-            if (!isMdFile) {
-                // 如果是文件夹，找到该文件夹下的第一个 .md 文件
-                const folderPrefix = fullPath + '/';
-                const subFiles = mdPaths.filter((mdPath) => mdPath.startsWith(folderPrefix));
-
-                if (subFiles.length > 0) {
-                    // 按路径排序（可选），取第一个
-                    subFiles.sort(); // 确保顺序一致
-                    const firstMdPath = subFiles[0];
-                    next(`/posts/${firstMdPath}`);
-                } else {
-                    next(); // 无 .md 文件，保持原路径
-                }
-            } else {
-                next(); // 是 .md 文件，直接进入
-            }
-        },
+            //route.params.pathMatch 是一个数组，包含 :pathMatch 捕获的路径段。
+            //join('/') 将数组用 / 连接成字符串，并添加 /posts/ 前缀。
+        })
     },
+    {
+        path: '/sitecards',
+        name: SiteNavigation,
+        component: SiteNavigation
+    }
+
 ]
 
 const router = createRouter({
     history: createWebHistory(),
     routes,
+    scrollBehavior(to, from, savedPosition) {
+        return {
+            el: '.mdcontent', // 替换为你的 Markdown 容器选择器
+            top: 0,
+        };
+    },
 });
 
 export default router;

@@ -11,5 +11,7 @@ body {
   margin: 0;
   padding: 0;
 }
-
+body {
+  overflow-x: hidden; /* 临时添加，观察滚动条是否消失 */
+}
 </style>
