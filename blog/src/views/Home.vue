@@ -1,28 +1,61 @@
 <template>
-    <div class='home-container'>
-        <Navbar />
-        <div class="content">
-            <LightHome />
-        </div>
-    </div>
+    <el-container>
+        <el-header>
+            <Navbar @get-allnotes="handlefirstnote" />
+        </el-header>
+        <el-main>
+            <div>
+                <ShowContent :notes="notes"  v-if="notes"/>
+            </div>
+        </el-main>
+        <el-footer>
+            <LightBack />
+        </el-footer>
+    </el-container>
 </template>
 <script setup>
-import Navbar from '../components/Navbar.vue';
-import Cool3DBackground from '../components/Cool3DBackground.vue';
-import LightHome from '../components/LightHome.vue';
+import { ref} from 'vue';
+import Navbar from '../components/navbar/Navbar.vue';
+import LightBack from '../components/home/LightBack.vue';
+import ShowContent from '../components/home/ShowContent.vue';
+
+const notes = ref(null);
+
+const handlefirstnote = (data) => {
+    notes.value = data;
+}
+
+
+
 </script>
 <style scoped>
-.home-container {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    flex-direction: column;
+.el-container {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
 }
-.home-container :deep(.navbar-container){
-    background-color: rgba(255, 255, 255,0.1);
-}
-.content {
+
+.el-header {
     width: 100vw;
-    height: 80vw;
+    z-index: 1000;
+    background-color: white;
+}
+
+.el-main {
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
+    /* 让 main 占据剩余空间 */
+    display: flex;
+    align-items: flex-end;
+    /* 内容垂直底部对齐 */
+}
+
+.el-footer {
+    position: absolute;
+    top: 0;
+    width: 80vw;
+    height: 80vh;
+    z-index: -1;
 }
 </style>
