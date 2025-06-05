@@ -1,27 +1,23 @@
 <template>
-    <!-- dialog 用户对话提示框 -->
-    <AddTagForm ref="addFormRef" @tag-created="fetchData"/>
+    <AddTagForm ref="addFormRef" @tag-created="fetchData" />
     <el-dialog title="提交笔记" v-model="dialogVisible" width="30%" @close="resetForm">
-        <!-- form 用户表单 -->
         <el-form :model="form" label-width="auto" :rules="rules" ref="formRef">
-            <!-- 笔记名称-->
             <el-form-item label="笔记名称" prop="title">
                 <el-input v-model="form.title" placeholder="请输入名称" />
             </el-form-item>
-            <!-- 笔记内容-->
             <el-form-item label="笔记内容" prop="svg">
-                <el-upload :http-request="customUpload" :limit="1" :on-exceed="handleExceed" accept=".md">
+                <el-upload ref="uploadRef" :http-request="customUpload" :limit="1" :on-exceed="handleExceed"
+                    accept=".md">
                     <el-button type="primary">上传 Markdown 文件</el-button>
                 </el-upload>
             </el-form-item>
-            <!-- 笔记归属标签-->
             <el-form-item label="创建归属文件夹" prop="tag">
                 <el-button @click="handleClick" class="createtag">创建文件夹</el-button>
             </el-form-item>
             <el-form-item label="选择归属文件夹" prop="tag">
                 <el-cascader v-model="form.tag" :options="options" :show-all-levels="false" :props="props" clearable />
             </el-form-item>
-        </el-form> 
+        </el-form>
         <template #footer>
             <el-button @click="dialogVisible = false">取消</el-button>
             <el-button type="primary" @click="submitForm">提交</el-button>
@@ -35,6 +31,9 @@ import { createNote, getTagTree } from '../../api';
 import { ElMessage } from 'element-plus';
 import { convertMarkdownToHtml } from '../../utils/markdown';
 import AddTagForm from './AddTagForm.vue';
+
+const uploadRef=ref();
+
 //获取标签树并转换为级联选择器所需格式
 const options = ref([]);
 // 数据转换函数
@@ -44,7 +43,7 @@ const transformMenuData = (menuData) => {
         label: item.name,
         children: item.children?.length ? transformMenuData(item.children) : [],
     }));
-};
+}
 
 // 获取并转换数据
 const fetchData = async () => {
@@ -52,9 +51,9 @@ const fetchData = async () => {
         const menuData = await getTagTree(); // 调用 API
         options.value = transformMenuData(menuData); // 转换数据
     } catch (error) {
-        console.error(error);
+        ElMessage.error('获取文件失败，请刷新重试')
     }
-};
+}
 
 const props = {
     checkStrictly: true,//任意选择子节点
@@ -79,7 +78,7 @@ const rules = {
     title: [{ required: true, message: '为文件编写标题', trigger: 'blur' }],
     content: [{ required: true, message: '选择要提交md文件', trigger: 'change' }],
     tag: [{ required: true, message: '选择或创建文件归属标签', trigger: 'blur' }],
-};
+}
 
 //限制文件上传并自动替换上一个文件
 const handleExceed = (files) => {
@@ -87,7 +86,7 @@ const handleExceed = (files) => {
     const file = files[0];
     file.uid = genFileId();
     upload.value.handleStart(file);
-};
+}
 
 // 自定义上传方法
 const customUpload = async (options) => {
@@ -98,9 +97,9 @@ const customUpload = async (options) => {
         const fileText = await readFileAsText(file);
         form.content = convertMarkdownToHtml(fileText);
     } catch (error) {
-        console.error('上传错误:', error);
+        ElMessage.error('上传文件错误，请刷新重试')
     }
-};
+}
 
 // 读取文件内容的辅助函数
 const readFileAsText = (file) => {
@@ -110,8 +109,9 @@ const readFileAsText = (file) => {
         reader.onerror = () => reject(reader.error);
         reader.readAsText(file);
     });
-};
+}
 
+const emit = defineEmits(['click', 'post-success'])
 
 // 提交表单
 const submitForm = async () => {
@@ -124,23 +124,26 @@ const submitForm = async () => {
                 content: form.content,
                 tag: form.tag,
             };
-            await createNote(result);
+            const postResponse = await createNote(result);
+            //通知： 通知父组件跳转到提交成功的笔记页面
+            emit('post-success', postResponse);
             ElMessage.success('提交成功！');
             dialogVisible.value = false;
             resetForm();
+
         }
     } catch (error) {
-        ElMessage.error('提交失败：' + (error.message || '服务器错误'));
-        console.error('提交错误:', error);
+        ElMessage.error('提交失败，请刷新重试');
     }
-};
+}
 
 // 重置表单
 const resetForm = () => {
     form.title = '';
     form.content = '';
     form.tag = '';
-};
+    uploadRef.value.clearFiles();
+}
 
 // 暴露打开对话框的方法
 defineExpose({
@@ -151,7 +154,6 @@ defineExpose({
 
 //打开创建文件夹对话框
 const addFormRef = ref(null);
-const emit = defineEmits(['click']);
 const handleClick = () => {
     addFormRef.value.openDialog();
 }

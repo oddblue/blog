@@ -1,9 +1,6 @@
 <template>
-    <!-- dialog 用户对话提示框 -->
     <el-dialog title="添加新条目" v-model="dialogVisible" width="30%" @close="resetForm">
-        <!-- form 用户表单 -->
         <el-form :model="form" :rules="rules" ref="formRef" label-width="100px">
-            <!-- 网站logo prop="logo" 关联form.logo -->
             <el-form-item label="网站LOGO" prop="logo">
                 <el-upload :action="''" :before-upload="beforeUpload" :http-request="handleUpload"
                     accept="image/png,image/svg+xml,image/x-icon,image/jpeg,image/webp" :show-file-list="false">
@@ -11,19 +8,15 @@
                 </el-upload>
                 <el-input v-model="form.logo" placeholder="或输入logo Base64" style="margin-top: 10px" />
             </el-form-item>
-            <!-- 网站名称 prop="name" 关联form.name -->
             <el-form-item label="网站名称" prop="name">
                 <el-input v-model="form.name" placeholder="请输入名称" />
             </el-form-item>
-            <!-- 网站描述 prop="description" 关联form.description -->
             <el-form-item label="网站描述" prop="description">
                 <el-input v-model="form.description" type="textarea" placeholder="请输入描述" />
             </el-form-item>
-            <!-- 网站URL prop="url" 关联form.url -->
             <el-form-item label="网站URL" prop="url">
                 <el-input v-model="form.url" placeholder="请输入URL" />
             </el-form-item>
-            <!-- 网站分类 prop="classify" 关联form.classify -->
             <el-form-item label="网站分类" prop="classify">
                 <el-input v-model="form.classify" placeholder="请输入分类或选择已有分类" />
             </el-form-item>
@@ -65,17 +58,17 @@ const rules = {
         { type: 'url', message: '请输入有效的URL', trigger: 'blur' },
     ],
     classify: [{ required: true, message: '请输入分类', trigger: 'blur' }],
-};
+}
 
 // 上传前验证文件类型
 const beforeUpload = (file) => {
-    const isSvgOrPng = ['image/png', 'image/svg+xml','image/x-icon','image/jpeg','image/webp'].includes(file.type);
+    const isSvgOrPng = ['image/png', 'image/svg+xml', 'image/x-icon', 'image/jpeg', 'image/webp'].includes(file.type);
     if (!isSvgOrPng) {
         ElMessage.error('仅支持上传 SVG、PNG、JPEG、WEBP 格式的图片！');
         return false;
     }
     return true;
-};
+}
 
 // 自定义上传处理，将文件转换为 Base64
 const handleUpload = (option) => {
@@ -124,8 +117,7 @@ const submitForm = async () => {
             resetForm();
         }
     } catch (error) {
-        ElMessage.error('提交失败：' + (error.message || '服务器错误'));
-        console.error('提交错误:', error);
+        ElMessage.error('提交失败，请刷新重试');
     }
 };
 

@@ -1,12 +1,14 @@
 <template>
-    <div class="markdown-body" v-html="localNote.content" ref="contentRef"></div>
+  <div class="markdown-body" v-html="localNote.content" ref="contentRef"></div>
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onMounted } from 'vue';
+import { ref, watch, nextTick } from 'vue';
 import 'github-markdown-css/github-markdown.css';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
+import { ElMessage } from 'element-plus';
+
 
 // 定义 props
 const props = defineProps({
@@ -19,24 +21,26 @@ const props = defineProps({
 
 // 本地状态
 const localNote = ref(props.note);
-const contentRef = ref(null); // 容器 DOM 的 ref，改名以更清晰
-const anchors = ref([]); // 存储锚点信息 { id: string, text: string, level: number }
+// 容器 DOM 的 ref
+const contentRef = ref(null);
+// 存储锚点信息 { id: string, text: string, level: number }
+const anchors = ref([]);
 
 // 高亮代码块
 const highlightCodeBlocks = async () => {
   if (!contentRef.value) {
-    console.warn('Content container not found.');
+    ElMessage.error('获取笔记内容失败，请刷新重试')
     return;
   }
-  const codeBlocks = contentRef.value.querySelectorAll('pre code'); // 查询所有代码块
+  // 查询所有代码块
+  const codeBlocks = contentRef.value.querySelectorAll('pre code');
   if (codeBlocks.length === 0) {
-    console.log('No code blocks found to highlight.');
     return;
   }
   codeBlocks.forEach((block) => {
     hljs.highlightElement(block);
   });
-};
+}
 
 const emit = defineEmits(['Blog-list']);
 
@@ -55,7 +59,8 @@ watch(
 
       //获取html内容中的h元素，并生成数组
       const headingElements = contentRef.value.querySelectorAll('h1, h2, h3, h4, h5, h6');
-      const existingIds = new Set(); // 用于确保生成的ID是唯一的，set变量存储不重复集合
+      // 用于确保生成的ID是唯一的，set变量存储不重复集合
+      const existingIds = new Set();
 
       headingElements.forEach(headingEl => {
         //遍历数组，将h元素的文本内容去除首位空格
@@ -63,14 +68,13 @@ watch(
         //parseInt将字符串转化为整数（第一个参数获取字符串，第二个参数将字符串解析内容转化数字进制），tagName获取元素标签名(h1元素返回h1),.substring获取字符串指定内容
         const level = parseInt(headingEl.tagName.substring(1), 10);
         let id = headingEl.id; // 检查是否已存在ID
-
         if (!id) { // 如果标题元素本身没有ID
           id = generateSafeId(text, existingIds);
           //将函数创造的id设置为元素id
           headingEl.id = id; // 将生成的ID设置回DOM元素上
         } else {
-          //如果有原始id，则直接使用原始id添加到id集合中
-          existingIds.add(id); // 如果已有ID，也加入set以便后续生成时查重
+          //如果有原始id，则直接使用原始id添加到id集合中 如果已有ID，也加入set以便后续生成时查重
+          existingIds.add(id);
         }
         // 只为有文本的标题创建锚点
         if (text) {
@@ -78,14 +82,12 @@ watch(
         }
       });
       anchors.value = newAnchorData;
-      //console.log(anchors.value)
-      emit("Blog-list",anchors)
-      
+      emit("Blog-list", anchors)
     } else if (!localNote.value.content) {
       anchors.value = []; // 如果内容为空，清空锚点
     }
   },
-  { deep: true, immediate: true }, // 立即执行以处理初始加载 immediate: true 确保在组件初始化时也执行一次
+  { deep: true, immediate: true },
 );
 
 
@@ -121,6 +123,6 @@ const generateSafeId = (text, existingIdsSet) => {
   }
   existingIdsSet.add(id);
   return id;
-};
+}
 
 </script>

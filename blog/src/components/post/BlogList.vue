@@ -1,17 +1,16 @@
 <template>
-  <div v-loading="loading">
-    <el-anchor v-if="!loading">
-      <el-anchor-link v-for="anchor in localAnchors" :key="anchor.id" :href="'#' + anchor.id" :title="anchor.text"
-        :data-level="anchor.level">
-        <el-text truncated :style="{ paddingLeft: (anchor.level - 1) * 15 + 'px' }" size="small">{{ anchor.text }}</el-text>
-      </el-anchor-link>
-    </el-anchor>
-  </div>
+  <el-anchor v-if="loading">
+    <el-anchor-link v-for="anchor in localAnchors" :key="anchor.id" :href="'#' + anchor.id" :title="anchor.text"
+      :data-level="anchor.level">
+      <el-text truncated :style="{ paddingLeft: (anchor.level - 1) * 15 + 'px' }" size="small">{{ anchor.text
+      }}</el-text>
+    </el-anchor-link>
+  </el-anchor>
+  <el-empty description="没有目录内容" v-else />
 </template>
 <script setup>
 import { ref, watch } from 'vue';
 
-// 定义 props
 const props = defineProps({
   anchors: {
     type: Object,
@@ -19,24 +18,30 @@ const props = defineProps({
   },
 });
 
-const loading = ref(true)
-const localAnchors = ref(props.anchors);
+const loading = ref(false);
+const localAnchors = ref(null);
 
+//监听父组件传递目录参数
 watch(
   () => props.anchors,
   () => {
-    //console.log(localAnchors.value.length)
-    //localAnchors.value = newanchors.value;
-    if (localAnchors.value.length > 0) {
-      loading.value = false
+    if (!props.anchors) {
+      localAnchors.value = null;
+      loading.value = false;
+    }
+    else if (props.anchors.value.length > 0) {
+      localAnchors.value = props.anchors.value;
+      loading.value = true;
+    }
+    else {
+      loading.value = false;
     }
   },
-  {immediate: true },
+  { immediate: true, deep: true },
 )
-
 </script>
 <style scoped>
-.el-text{
+.el-text {
   width: 12vw;
 }
 </style>

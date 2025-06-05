@@ -1,46 +1,54 @@
 <template>
-    <el-menu unique-opened router>
-      <div v-for="children in tagtreecontent.children"
-        v-if="tagtreecontent && tagtreecontent.children && tagtreecontent.children.length > 0">
-        <MenuItems :submenu="children" />
-      </div>
-      <el-menu-item v-for="note in tagtreecontent.notes"
-        v-if="tagtreecontent && tagtreecontent.notes && tagtreecontent.notes.length > 0"
-        :index="`/post/note/${note.tag}/${note._id}`">
-        📜{{ note.title }}
-      </el-menu-item>
-    </el-menu>
+  <el-menu unique-opened router>
+    <div v-for="children in tagtreecontent.children"
+      v-if="tagtreecontent && tagtreecontent.children && tagtreecontent.children.length > 0">
+      <MenuItems :submenu="children" />
+    </div>
+    <el-menu-item v-for="note in tagtreecontent.notes"
+      v-if="tagtreecontent && tagtreecontent.notes && tagtreecontent.notes.length > 0"
+      :index="`/post/note/${note.tag}/${note._id}`">
+      📜{{ note.title }}
+    </el-menu-item>
+  </el-menu>
 </template>
 
 <script setup>
-//import MenuItems from '../navbar/MenuItem.vue';
 import { getAllTree } from '../../api';
-import { ref, watch } from 'vue';
+import { ref, watch, inject } from 'vue';
 import { ElMessage } from 'element-plus';
 import MenuItems from './MenuItem.vue';
 
-// 定义 props
+
+const notification = inject('notification');
+
+watch(notification,
+  (newValue) => {
+    if (newValue) {
+      tagTree();
+    }
+  });
+
+
 const props = defineProps({
   topfolders: {
     type: Object,
   },
 });
 
-// 本地状态
+
 const localTopfolders = ref(props.topfolders);
 //获取所有文件夹和笔记信息
 const tagtreecontent = ref([]);
+
+//获取文件夹和笔记树状结构
 const tagTree = async () => {
   try {
     const response = await getAllTree();
-    tagtreecontent.value = response.find(item => item._id === props.topfolders._id)
-    //console.log(tagtreecontent)
-    //console.log(tagtreecontent.value)
+    tagtreecontent.value = response.find(item => item._id === props.topfolders._id);
   } catch (err) {
-    console.error('Failed to fetch menu data:', err);
-    ElMessage.error('Failed to fetch menu data:')
+    ElMessage.error('获取内容失败，请刷新重试');
   }
-};
+}
 
 watch(
   () => props.topfolders,

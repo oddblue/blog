@@ -8,12 +8,6 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: 'BackgroundCircles'
-}
-</script>
-
 <style scoped>
 .background-container {
     z-index: -1;

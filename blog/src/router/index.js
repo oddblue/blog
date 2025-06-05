@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Post from '../views/Post.vue'
 import SiteNavigation from '../views/SiteNavigation.vue';
+import CallBack from '../components/home/CallBack.vue';
+import Dashboard from '../components/home/Dashboard.vue';
 
 const routes = [
     {
@@ -19,16 +21,21 @@ const routes = [
         name: 'NoteView',
         component: Post,
     },
-    //{//用户点击顶级文件夹或点击概览触发
-    //       path: '/post/overview/:topfolders',
-    //      name: 'Overview',
-    //      component: Post,
-    //   },
     {
         path: '/sitecards',
         name: SiteNavigation,
         component: SiteNavigation
-    }
+    },
+    {
+        path: '/callback',
+        name: CallBack,
+        component: CallBack
+    },
+        {
+        path: '/dashboard',
+        name: Dashboard,
+        component: Dashboard
+    },
 
 ]
 

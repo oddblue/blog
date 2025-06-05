@@ -46,16 +46,15 @@ const submitForm = async () => {
             dialogVisible.value = false;
             resetForm();
         }
-    } catch (error) {
-        ElMessage.error('提交失败：' + (error.message || '服务器错误'));
-        console.error('提交错误:', error);
+    } catch {
+        ElMessage.error('提交失败，请刷新重试！');
     }
-};
+}
 
 // 重置表单
 const resetForm = () => {
     form.description = '';
-};
+}
 
 
 // 控制对话框显示

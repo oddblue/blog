@@ -1,11 +1,12 @@
 <template>
     <el-container>
+        <AddPostForm ref="addFormRef" />
         <el-header>
-            <Navbar @get-allnotes="handlefirstnote" />
+            <Navbar @openDialog="handleClick" />
         </el-header>
         <el-main>
             <div>
-                <ShowContent :notes="notes"  v-if="notes"/>
+                <ShowContent  @openDialog="handleClick" />
             </div>
         </el-main>
         <el-footer>
@@ -14,19 +15,26 @@
     </el-container>
 </template>
 <script setup>
-import { ref} from 'vue';
+import { ref, provide } from 'vue';
 import Navbar from '../components/navbar/Navbar.vue';
 import LightBack from '../components/home/LightBack.vue';
 import ShowContent from '../components/home/ShowContent.vue';
+import AddPostForm from '../components/post/AddPostForm.vue';
 
-const notes = ref(null);
+const notification = ref(false);
 
-const handlefirstnote = (data) => {
-    notes.value = data;
+// 切换状态以触发通知
+provide('noteList', () => {
+    notification.value = !notification.value;
+});
+// 提供状态给 目录列表 监听
+provide('notification', notification);
+
+const addFormRef = ref(null);
+//打开笔记上传表单
+const handleClick = () => {
+    addFormRef.value.openDialog();
 }
-
-
-
 </script>
 <style scoped>
 .el-container {

@@ -25,7 +25,7 @@ import { Delete, Edit } from '@element-plus/icons-vue'
 import { deleteWebsite } from '../../api';
 import { ElMessageBox, ElMessage } from 'element-plus';
 
-// 响应式变量，控制删除按钮的显示
+
 const isHovered = ref(false);
 
 const props = defineProps({
@@ -56,7 +56,6 @@ const deleteWebsitesfetch = async (id) => {
         emit('submit-success');
     } catch (error) {
         ElMessage.error('删除失败');
-        console.error(error);
     }
 }
 

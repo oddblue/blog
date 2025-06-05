@@ -1,6 +1,5 @@
 <template>
     <UpdateContent ref="updateContentRef" />
-    <AddPostForm ref="addFormRef" />
     <el-row :gutter="20" class="first-content">
         <el-col :span="6">
             <div class="nav-item" @click="handleFirstNote">
@@ -15,13 +14,14 @@
             </router-link>
         </el-col>
         <el-col :span="6">
-            <div class="nav-item" @click="handleClick">
+            <div class="nav-item" @click="homeOpenDialog">
                 <span>📂 笔记上传</span>
                 <span>➡️</span>
             </div>
         </el-col>
         <el-col :span="6">
-            <el-popover placement="top-start" title="该功能暂未开放" :width="200" trigger="hover">
+            <el-popover placement="top-start" title="该功能暂未开放" :width="200" trigger="hover"
+                content="可发送邮件到3530970736@qq.com">
                 <template #reference>
                     <div class="nav-item">
                         <span>📬 留言板</span>
@@ -53,40 +53,34 @@
             </div>
         </el-col>
         <el-col :span="8">
-            <div class="nav-item" @click="goToSite"> 
-                    <span>🔓 git</span>
-                    <span>➡️</span>
-            </div>
+            <el-popover placement="top-start" title="项目暂未开源" :width="200" trigger="hover"
+                content="需求代码可发送邮件到3530970736@qq.com">
+                <template #reference>
+                    <div class="nav-item">
+                        <span>🔓 git</span>
+                        <span>➡️</span>
+                    </div>
+                </template>
+            </el-popover>
         </el-col>
     </el-row>
 </template>
 <script setup>
 import { ref } from 'vue'
 import UpdateContent from './UpdateContent.vue';
-import AddPostForm from '../post/AddPostForm.vue';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
+import { getAllTree } from '../../api';
 
 const router = useRouter();
-const props = defineProps({
-    notes: {
-        type: Object,
-        required: true
-    }
-});
 
-//跳转开源项目网址
-const goToSite = () => {
-    window.open(props.site.url, '_blank');
-};
-
+//寻找第一个笔记id
 function findFirstNoteId(data) {
     function traverse(obj) {
-
         // 检查当前层的笔记
         if (obj.notes && obj.notes.length > 0) {
             return { noteId: obj.notes[0]._id, nowfolders: obj._id }; // 返回第一个笔记的 _id
         }
-
         // 递归检查子节点
         if (obj.children && obj.children.length > 0) {
             for (const child of obj.children) {
@@ -94,7 +88,6 @@ function findFirstNoteId(data) {
                 if (result) return result; // 返回子节点中找到的第一个 _id
             }
         }
-
         return null; // 当前对象没有笔记
     }
 
@@ -103,40 +96,39 @@ function findFirstNoteId(data) {
         const result = traverse(item);
         if (result) return result; // 返回第一个找到的 _id
     }
-
     // 如果没有找到笔记，抛出错误
     throw new Error("数据结构中未找到任何笔记");
 }
 
 
 
-const handleFirstNote = () => {
-
-    const { noteId, nowfolders } = findFirstNoteId(props.notes);
-
-    console.log(findFirstNoteId(props.notes))
-
-    if (noteId) {
-        router.push(`/post/note/${nowfolders}/${noteId}`);
+const handleFirstNote = async () => {
+    try {
+        const response = await getAllTree();
+        const { noteId, nowfolders } = findFirstNoteId(response);
+        if (noteId) {
+            router.push(`/post/note/${nowfolders}/${noteId}`);
+        }
+        else {
+            router.push(`/post/folder/${props.notes._id}`);
+        }
     }
-    else {
-        router.push(`/post/folder/${props.notes._id}`);
+    catch {
+        ElMessage.error('你还没有上传笔记，赶快上传笔记吧！');
     }
-
 }
 
 
 //打开提交更新日志弹出框
-const updateContentRef = ref(null)
+const updateContentRef = ref(null);
 const openUpdated = () => {
     updateContentRef.value.openDialog();
 }
-
+const emit = defineEmits(['openDialog']);
 
 //打开更新日志弹出框
-const addFormRef = ref(null);
-const handleClick = () => {
-    addFormRef.value.openDialog();
+const homeOpenDialog = () => {
+    emit('openDialog');
 }
 
 </script>
@@ -157,7 +149,7 @@ const handleClick = () => {
     min-width: 150px;
     font-size: 24px;
     padding: 10px;
-        display: flex;
+    display: flex;
     justify-content: space-between;
 }
 

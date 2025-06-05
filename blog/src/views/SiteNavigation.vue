@@ -1,18 +1,15 @@
 <template>
     <el-container>
+        <AddPostForm ref="addFormRef" />
         <el-header>
             <el-affix :offset="0">
-                <Navbar />
+                <Navbar  @openDialog="handleClick"/>
             </el-affix>
         </el-header>
-        <AddForm ref="addFormRef" @submit-success="handleFormSubmit" />
+        <AddForm ref="addWebFormRef" @submit-success="handleFormSubmit" />
         <UpdateForm ref="updateFormRef" @submit-success="handleFormSubmit" :website="website" />
         <el-main class="navigation-container" v-if="loading">
-            <button class="floating-button" @click="handleClick">
-                <el-icon>
-                    <Plus />
-                </el-icon>
-            </button>
+            <el-button type="primary" :icon="Plus" class="floating-button" @click="handleWebClick" />
             <el-row :gutter="40" justify="center">
                 <el-col :span="16">
                     <div v-for="category in categories" :key="category" :id="category">
@@ -35,13 +32,13 @@
             </el-row>
         </el-main>
         <el-empty :image-size="200" v-else>
-            <el-button type="primary" @click="handleClick">添加网站信息</el-button>
+            <el-button type="primary" @click="handleWebClick">添加网站信息</el-button>
         </el-empty>
     </el-container>
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick,provide } from 'vue';
 import SiteCard from '../components/website/SiteCard.vue';
 import Navbar from '../components/navbar/Navbar.vue'
 import AddForm from '../components/website/AddForm.vue';
@@ -49,6 +46,7 @@ import UpdateForm from '../components/website/UpdateForm.vue';
 import WebSiteList from '../components/website/WebSiteList.vue';
 import { Plus } from '@element-plus/icons-vue';
 import { getWebsites } from '../api';
+import AddPostForm from '../components/post/AddPostForm.vue';
 
 
 const sites = ref([]);// 存储网站数据
@@ -79,12 +77,14 @@ const getSitesByCategory = (category) => {
 };
 
 // 表单组件引用
-const addFormRef = ref(null);
+const addWebFormRef = ref(null);
 const updateFormRef = ref(null);
+
 const emit = defineEmits(['click']);
-const handleClick = () => {
-    addFormRef.value.openDialog();
+const handleWebClick = () => {
+    addWebFormRef.value.openDialog();
 }
+
 //存储待更新网站信息，并传递给更新表单组件
 const website = ref([]);
 const updateWebsitesform = async (site) => {
@@ -96,6 +96,20 @@ const updateWebsitesform = async (site) => {
 const handleFormSubmit = () => {
     getWebsitesfetch(); // 重新获取数据
 };
+
+const notification = ref(false);
+// 切换状态以触发通知
+provide('noteList', () => {
+    notification.value = !notification.value;
+});
+// 提供状态给 目录列表 监听
+provide('notification', notification);
+
+const addFormRef = ref(null);
+//打开笔记上传表单
+const handleClick = () => {
+    addFormRef.value.openDialog();
+}
 
 onMounted(() => {
     getWebsitesfetch();

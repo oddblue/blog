@@ -2,8 +2,11 @@
     <el-sub-menu :index=props.submenu._id>
         <template #title index="/posts/overview">📁 {{ props.submenu.name }}</template>
         <div v-for="chil in props.submenu.children">
-            <MenuItems v-if="chil.children && chil.children.length > 0" :submenu="chil" />
-            <el-menu-item :index=chil._id v-else>
+            <MenuItems v-if="(chil.children && chil.children.length > 0) || (chil.notes && chil.notes.length > 0)"
+                :submenu="chil" />
+            <el-menu-item
+                :index="chil.notes.length > 0 ? `/post/note/${chil.notes[0].tag}/${chil.notes[0]._id}` : `/post/folder/${chil._id}`"
+                v-else>
                 📁 {{ chil.name }}
             </el-menu-item>
         </div>
