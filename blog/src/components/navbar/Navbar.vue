@@ -48,7 +48,7 @@ const login = () => {
     }
 };
 const logoutFn = () =>
-    logout({ logoutParams: { returnTo: 'http://localhost:5173' } });
+    logout({ logoutParams: { returnTo: 'https://blog-nn1f8tvsf-oddblues-projects.vercel.app' } });
 
 
 
@@ -71,8 +71,6 @@ const tagTree = async () => {
     try {
         const response = await getAllTree();
         tagtreecontent.value = response;
-        //console.log(tagtreecontent)
-        //console.log(tagtreecontent.value.find(item => item._id === "6812b82d6abf820a39f12c22"))
     } catch (err) {
         ElMessage.error('网络故障，请刷新重试');
     }
