@@ -19,7 +19,7 @@ app.use(
     domain: 'dev-j8kiozma53twzodw.us.auth0.com',
     clientId: '3VZKYl4iq630d4Z2V0IAzbxNASNYs697',
     authorizationParams: {
-      redirect_uri: 'https://blog-nn1f8tvsf-oddblues-projects.vercel.app/callback',
+      redirect_uri: 'https://blog-eosin-iota.vercel.app/callback',
       audience: 'https://dev-j8kiozma53twzodw.us.auth0.com/api/v2/',
       connection: 'github'
     },
