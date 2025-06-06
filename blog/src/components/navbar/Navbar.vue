@@ -48,7 +48,7 @@ const login = () => {
     }
 };
 const logoutFn = () =>
-    logout({ logoutParams: { returnTo: 'http://localhost:5173' } });
+    logout({ logoutParams: { returnTo: 'https://blog-nn1f8tvsf-oddblues-projects.vercel.app' } });
 
 
 
