@@ -48,7 +48,7 @@ const login = () => {
     }
 };
 const logoutFn = () =>
-    logout({ logoutParams: { returnTo: 'https://blog-nn1f8tvsf-oddblues-projects.vercel.app' } });
+    logout({ logoutParams: { returnTo: 'https://blog-eosin-iota.vercel.app' } });
 
 
 
