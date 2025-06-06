@@ -2,7 +2,7 @@
 import axios from 'axios'
 
 const request = axios.create({
-  baseURL: 'http://localhost:3000/api'||import.meta.env.VITE_API_BASE_URL , // 动态获取 API 基地址
+  baseURL: import.meta.env.VITE_API_BASE_URL , // 动态获取 API 基地址
   timeout: 10000, // 请求超时时间
   headers: {
     'Content-Type': 'application/json'

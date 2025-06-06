@@ -30,7 +30,6 @@ const routes = [
         name: CallBack,
         component: CallBack
     }
-
 ]
 
 const router = createRouter({
