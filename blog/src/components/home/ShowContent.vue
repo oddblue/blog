@@ -13,11 +13,22 @@
                 <span>➡️</span>
             </router-link>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="6" v-if="isLoggedIn && isAdmin">
             <div class="nav-item" @click="homeOpenDialog">
                 <span>📂 笔记上传</span>
                 <span>➡️</span>
             </div>
+        </el-col>
+        <el-col :span="6" v-else>
+            <el-popover placement="top-start" title="该功能暂未开放" :width="200" trigger="hover"
+                content="可发送邮件到3530970736@qq.com">
+                <template #reference>
+                    <div class="nav-item" @click="homeOpenDialog">
+                        <span>📂 笔记上传</span>
+                        <span>➡️</span>
+                    </div>
+                </template>
+            </el-popover>
         </el-col>
         <el-col :span="6">
             <el-popover placement="top-start" title="该功能暂未开放" :width="200" trigger="hover"
@@ -66,11 +77,20 @@
     </el-row>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import UpdateContent from './UpdateContent.vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { getAllTree } from '../../api';
+import { useAuth0 } from '@auth0/auth0-vue';
+
+const { isAuthenticated, isLoading,user } = useAuth0();
+
+const isLoggedIn = computed(() => !isLoading.value && isAuthenticated.value);
+// 检查用户是否为管理员
+const isAdmin = computed(() => {
+    return isLoggedIn.value && user.value?.['https://blog-eosin-iota.vercel.app/role'] === 'admin';
+});
 
 const router = useRouter();
 

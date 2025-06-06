@@ -3,21 +3,23 @@
     <ManageFiles ref="manageFilesFormRef" @editFile-success="editFileRefresh" />
     <AddPostForm ref="addFormRef" @post-success="refreshPost" />
     <Tiptap :note="note" v-if="showview === 'NoteView' && note" ref="changeFormRef" />
-    <el-button type="primary" :icon="Files" circle class="button" @click="managingFiles"
-      :style="{ bottom: filesBottom + 'px' }" />
+    <div v-if="isAdmin">
+      <el-button type="primary" :icon="Files" circle class="button" @click="managingFiles"
+        :style="{ bottom: filesBottom + 'px' }" />
+      <el-button type="danger" :icon="Delete" circle class="button" @click="clickToDelete"
+        :style="{ bottom: deleteBottom + 'px' }" />
+      <el-button type="primary" :icon="Edit" circle class="button" @click="handleClickTiptap"
+        :style="{ bottom: editBottom + 'px' }" />
+      <el-button type="primary" :icon="Plus" circle class="button" @click="handleClick"
+        :style="{ bottom: plusBottom + 'px' }" />
+    </div>
     <el-button type="primary" :icon="Download" circle class="button" @click="convertAndDownload"
       :style="{ bottom: downloadBottom + 'px' }" />
-    <el-button type="danger" :icon="Delete" circle class="button" @click="clickToDelete"
-      :style="{ bottom: deleteBottom + 'px' }" />
-    <el-button type="primary" :icon="Edit" circle class="button" @click="handleClickTiptap"
-      :style="{ bottom: editBottom + 'px' }" />
-    <el-button type="primary" :icon="Plus" circle class="button" @click="handleClick"
-      :style="{ bottom: plusBottom + 'px' }" />
     <el-button type="primary" :icon="ArrowUp" class="button-group" @click="openBottons" v-if="showBottoms" />
     <el-button type="primary" :icon="ArrowDown" class="button-group" @click="closeBottons" v-if="!showBottoms" />
     <el-header>
       <el-affix :offset="0">
-        <Navbar @openDialog="handleClick"/>
+        <Navbar @openDialog="handleClick" />
       </el-affix>
     </el-header>
     <el-container>
@@ -29,7 +31,7 @@
       <el-main>
         <BlogContent :note="note" v-if="showview === 'NoteView'" @Blog-list="getnewanchors" />
         <el-empty :image-size="200" description="当前文件夹下没有笔记" v-if="showview === 'FolderView'">
-          <el-button type="primary" @click="handleClick">上传笔记</el-button>
+          <el-button type="primary" @click="handleClick" v-if="isAdmin">上传笔记</el-button>
         </el-empty>
       </el-main>
       <el-aside>
@@ -64,6 +66,15 @@ import { getNoteById, getTopLevel, deleteNote, getTagById } from '../api/index.j
 import AddPostForm from '../components/post/AddPostForm.vue';
 import { ArrowUp, Plus, Delete, Edit, ArrowDown, Download, Files } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { useAuth0 } from '@auth0/auth0-vue';
+
+const { isAuthenticated, isLoading,user } = useAuth0();
+
+const isLoggedIn = computed(() => !isLoading.value && isAuthenticated.value);
+// 检查用户是否为管理员
+const isAdmin = computed(() => {
+    return isLoggedIn.value && user.value?.['https://blog-eosin-iota.vercel.app/role'] === 'admin';
+});
 
 const router = useRouter();
 const route = useRoute();
@@ -87,20 +98,20 @@ const showBottoms = ref(true);
 
 //关闭展开按钮组
 const closeBottons = () => {
-  plusBottom.value -= 75;
+  plusBottom.value -= 255;
   editBottom.value -= 135;
   filesBottom.value -= 195;
-  downloadBottom.value -= 255;
+  downloadBottom.value -= 75;
   deleteBottom.value -= 315;
   showBottoms.value = true;
 }
 
 //展开按钮组
 const openBottons = () => {
-  plusBottom.value += 75;
+  plusBottom.value += 255;
   editBottom.value += 135;
   filesBottom.value += 195;
-  downloadBottom.value += 255;
+  downloadBottom.value += 75;
   deleteBottom.value += 315;
   showBottoms.value = false;
 }

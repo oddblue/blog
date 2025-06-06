@@ -9,7 +9,7 @@
         <AddForm ref="addWebFormRef" @submit-success="handleFormSubmit" />
         <UpdateForm ref="updateFormRef" @submit-success="handleFormSubmit" :website="website" />
         <el-main class="navigation-container" v-if="loading">
-            <el-button type="primary" :icon="Plus" class="floating-button" @click="handleWebClick" />
+            <el-button type="primary" :icon="Plus" class="floating-button" @click="handleWebClick" v-if="isAdmin"/>
             <el-row :gutter="40" justify="center">
                 <el-col :span="16">
                     <div v-for="category in categories" :key="category" :id="category">
@@ -32,13 +32,13 @@
             </el-row>
         </el-main>
         <el-empty :image-size="200" v-else>
-            <el-button type="primary" @click="handleWebClick">添加网站信息</el-button>
+            <el-button type="primary" @click="handleWebClick" v-if="isAdmin">添加网站信息</el-button>
         </el-empty>
     </el-container>
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick,provide } from 'vue';
+import { ref, onMounted, nextTick,provide,computed } from 'vue';
 import SiteCard from '../components/website/SiteCard.vue';
 import Navbar from '../components/navbar/Navbar.vue'
 import AddForm from '../components/website/AddForm.vue';
@@ -47,6 +47,15 @@ import WebSiteList from '../components/website/WebSiteList.vue';
 import { Plus } from '@element-plus/icons-vue';
 import { getWebsites } from '../api';
 import AddPostForm from '../components/post/AddPostForm.vue';
+import { useAuth0 } from '@auth0/auth0-vue';
+
+const { isAuthenticated, isLoading,user } = useAuth0();
+
+const isLoggedIn = computed(() => !isLoading.value && isAuthenticated.value);
+// 检查用户是否为管理员
+const isAdmin = computed(() => {
+    return isLoggedIn.value && user.value?.['https://blog-eosin-iota.vercel.app/role'] === 'admin';
+});
 
 
 const sites = ref([]);// 存储网站数据

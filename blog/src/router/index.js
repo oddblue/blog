@@ -3,7 +3,6 @@ import Home from '../views/Home.vue'
 import Post from '../views/Post.vue'
 import SiteNavigation from '../views/SiteNavigation.vue';
 import CallBack from '../components/home/CallBack.vue';
-import Dashboard from '../components/home/Dashboard.vue';
 
 const routes = [
     {
@@ -30,12 +29,7 @@ const routes = [
         path: '/callback',
         name: CallBack,
         component: CallBack
-    },
-        {
-        path: '/dashboard',
-        name: Dashboard,
-        component: Dashboard
-    },
+    }
 
 ]
 

@@ -9,12 +9,14 @@
             </el-menu-item>
         </div>
         <el-menu-item index='/sitecards'>网址导航 </el-menu-item>
-        <el-menu-item @click="navbarOpenDialog">笔记上传 </el-menu-item>
+        <el-menu-item @click="navbarOpenDialog" v-if="isLoggedIn && isAdmin">笔记上传 </el-menu-item>
         <div class="icon-container" @mouseenter="showLogin = true" @mouseleave="showLogin = false">
             <el-menu-item @click="goGithub">
-                <img src="../../assets/logo/github-fill.svg" class="github-icon" :class="{ 'move-left': showLogin }" />
+                <img src="../../assets/logo/github-fill.svg" class="github-icon" :class="{ 'move-left': showLogin }"
+                    v-if="!isLoggedIn" />
+                <img :src='userInfo.picture' class="github-icon" :class="{ 'move-left': showLogin }" v-else />
             </el-menu-item>
-            <el-menu-item @click="login" v-if="!isAuthenticated">
+            <el-menu-item @click="login" v-if="!isLoggedIn">
                 <img src="../../assets/logo/login.svg" class="login-icon" :class="{ 'show': showLogin }" />
             </el-menu-item>
             <el-menu-item @click="logoutFn" v-else>
@@ -25,7 +27,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, inject, watch } from 'vue';
+import { ref, onMounted, inject, watch, computed } from 'vue';
 import { getAllTree } from '../../api';
 import { ElMessage } from 'element-plus';
 import MenuItems from './MenuItem.vue';
@@ -33,22 +35,34 @@ import AddPostForm from '../post/AddPostForm.vue';
 import { useRouter } from 'vue-router';
 import { useAuth0 } from '@auth0/auth0-vue';
 
-const { loginWithRedirect, logout, isAuthenticated } = useAuth0();
+const { loginWithRedirect, logout, isAuthenticated, user, isLoading, } = useAuth0();
 
-const isLoggingIn = ref(false);
-const login = () => {
-    if (isLoggingIn.value) return;
-    isLoggingIn.value = true;
+// 检查用户信息
+const userInfo = computed(() => (isLoggedIn.value ? user.value : null));
+// 检查用户是否已登录
+const isLoggedIn = computed(() => !isLoading.value && isAuthenticated.value);
+// 检查用户是否为管理员
+const isAdmin = computed(() => {
+    return isLoggedIn.value && user.value?.['https://blog-eosin-iota.vercel.app/role'] === 'admin';
+});
+
+const login = async () => {
+    if (isLoggedIn.value) return;
     try {
-        loginWithRedirect();
+        await loginWithRedirect({
+            authorizationParams: {
+                redirect_uri: window.location.origin + '/callback',
+            },
+        });
     } catch (err) {
-        console.error('登录错误:', err);
+        ElMessage.error('登录错误,请稍后重试');
     } finally {
         isLoggingIn.value = false;
     }
 };
+
 const logoutFn = () =>
-    logout({ logoutParams: { returnTo: 'https://blog-eosin-iota.vercel.app' } });
+    logout({ logoutParams: { returnTo: window.location.origin } });
 
 
 
@@ -126,8 +140,8 @@ onMounted(() => {
 }
 
 .github-icon {
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 36px;
     transition: transform 0.3s ease;
 }
 
