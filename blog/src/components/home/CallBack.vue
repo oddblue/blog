@@ -45,8 +45,7 @@ onMounted(async () => {
       }
     };
   } catch (err) {
-    console.error('回调错误:', err);
-    error.value = err.message || '处理回调失败';
+   ElMessage.error('回调错误:');
   }
 });
 </script>
