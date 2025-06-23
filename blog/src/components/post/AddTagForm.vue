@@ -62,7 +62,7 @@ const submitForm = async () => {
             if (form.parentId) {
                 result.parentId = form.parentId;
             }
-            await createTag(form);
+            await createTag(result);
             ElMessage.success('创建文件夹成功！');
             dialogVisible.value = false;
             resetForm();
@@ -72,7 +72,7 @@ const submitForm = async () => {
             updateNoteList();
         }
     } catch(err){
-        ElMessage.error('提交失败，请刷新重试',err);
+        ElMessage.error('提交失败，请刷新重试');
 
     }
 }
